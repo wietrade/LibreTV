@@ -82,6 +82,7 @@ let currentVideoTitle = '';
 let currentEpisodeIndex = 0;
 let art = null; // 用于 ArtPlayer 实例
 let currentHls = null; // 跟踪当前HLS实例
+let currentP2PEngine = null; // 跟踪当前P2P引擎实例
 let currentEpisodes = [];
 let episodesReversed = false;
 let autoplayEnabled = true; // 默认开启自动连播
@@ -481,8 +482,51 @@ function initPlayer(videoUrl) {
                     }
                 }
 
-                // 创建新的HLS实例
-                const hls = new Hls(hlsConfig);
+                // 清理之前的P2P引擎实例
+                if (currentP2PEngine && currentP2PEngine.destroy) {
+                    try {
+                        currentP2PEngine.destroy();
+                    } catch (e) {
+                    }
+                }
+
+                // 尝试初始化P2P Media Loader
+                let hls;
+                let p2pEngineInitialized = false;
+
+                try {
+                    // 检查P2P Media Loader是否可用
+                    if (typeof window.P2PMediaLoader !== 'undefined' && window.P2PMediaLoader.HlsJsP2PEngine) {
+                        // 初始化P2P引擎，使用默认tracker配置
+                        const p2pEngine = new window.P2PMediaLoader.HlsJsP2PEngine({
+                            core: {
+                                // 使用库提供的默认tracker服务器
+                                // 不进行自定义配置
+                            }
+                        });
+
+                        currentP2PEngine = p2pEngine;
+
+                        // 使用P2P增强的配置创建HLS实例
+                        hls = new Hls({
+                            ...hlsConfig,
+                            ...p2pEngine.getConfig()
+                        });
+
+                        p2pEngine.bindHls(hls);
+                        p2pEngineInitialized = true;
+                        console.log('P2P Media Loader initialized successfully');
+                    } else {
+                        // P2P不可用，回退到标准HLS
+                        console.log('P2P Media Loader not available, using standard HLS');
+                        hls = new Hls(hlsConfig);
+                    }
+                } catch (e) {
+                    // P2P初始化失败，回退到标准HLS
+                    console.warn('P2P initialization failed, falling back to standard HLS:', e);
+                    hls = new Hls(hlsConfig);
+                }
+
                 currentHls = hls;
 
                 // 跟踪是否已经显示错误
