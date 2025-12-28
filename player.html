@@ -224,9 +224,19 @@
     </script>
     
     <script src="libs/hls.min.js" crossorigin="anonymous"></script>
-    <script src="libs/p2p-media-loader-core.min.js" crossorigin="anonymous"></script>
-    <script src="libs/p2p-media-loader-hlsjs.min.js" crossorigin="anonymous"></script>
     <script src="libs/artplayer.min.js" crossorigin="anonymous"></script>
+
+    <!-- Import map for P2P Media Loader modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "p2p-media-loader-core": "./libs/p2p-media-loader-core.min.js"
+        }
+    }
+    </script>
+
+    <!-- Import P2P Media Loader -->
+    <script type="module" src="./libs/p2p-loader.js"></script>
 
     <script src="js/config.js"></script>
     <script src="js/proxy-auth.js"></script>
