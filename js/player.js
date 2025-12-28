@@ -487,6 +487,7 @@ function initPlayer(videoUrl) {
                     try {
                         currentP2PEngine.destroy();
                     } catch (e) {
+                        console.warn('Error destroying P2P engine:', e);
                     }
                 }
 
@@ -498,12 +499,8 @@ function initPlayer(videoUrl) {
                     // 检查P2P Media Loader是否可用
                     if (typeof window.P2PMediaLoader !== 'undefined' && window.P2PMediaLoader.HlsJsP2PEngine) {
                         // 初始化P2P引擎，使用默认tracker配置
-                        const p2pEngine = new window.P2PMediaLoader.HlsJsP2PEngine({
-                            core: {
-                                // 使用库提供的默认tracker服务器
-                                // 不进行自定义配置
-                            }
-                        });
+                        // 传递空对象以使用库的默认配置
+                        const p2pEngine = new window.P2PMediaLoader.HlsJsP2PEngine();
 
                         currentP2PEngine = p2pEngine;
 

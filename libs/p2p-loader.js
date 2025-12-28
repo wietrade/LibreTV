@@ -7,9 +7,11 @@
 import { HlsJsP2PEngine } from './p2p-media-loader-hlsjs.min.js';
 
 // Make it available globally for player.js to use
-window.P2PMediaLoader = {
-    HlsJsP2PEngine: HlsJsP2PEngine
-};
+// Ensure we don't overwrite existing global objects
+if (!window.P2PMediaLoader) {
+    window.P2PMediaLoader = {};
+}
+window.P2PMediaLoader.HlsJsP2PEngine = HlsJsP2PEngine;
 
 // Dispatch an event when P2P is ready
 window.dispatchEvent(new Event('p2p-ready'));
